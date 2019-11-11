@@ -46,7 +46,8 @@ usage(void)
 	fprintf(stderr,
 	    "usage: scrypt {enc | dec | info} [-f] [-M maxmem]"
 	    " [-m maxmemfrac]\n"
-	    "              [-P] [-t maxtime] [-v] infile [outfile]\n"
+	    "              [-P] [--passphrase-env VAR]\n"
+	    "              [-t maxtime] [-v] infile [outfile]\n"
 	    "       scrypt --version\n");
 	exit(1);
 }
@@ -68,6 +69,8 @@ main(int argc, char *argv[])
 	const char * infilename;
 	const char * outfilename;
 	char * passwd;
+	const char * passwd_env_arg = NULL;
+	const char * passwd_env = NULL;
 	int rc;
 	int verbose = 0;
 	struct scryptdec_file_cookie * C = NULL;
@@ -117,6 +120,9 @@ main(int argc, char *argv[])
 				warnp("Invalid option: -m %s", optarg);
 				exit(1);
 			}
+			break;
+		GETOPT_OPTARG("--passphrase-env"):
+			passwd_env_arg = optarg;
 			break;
 		GETOPT_OPTARG("-t"):
 			if (PARSENUM(&maxtime, optarg, 0, INFINITY)) {
@@ -188,7 +194,18 @@ main(int argc, char *argv[])
 	}
 
 	/* Get the password. */
-	if (0) {
+	if (passwd_env_arg != NULL) {
+		/* We're not allowed to modify the output of getenv(). */
+		if ((passwd_env = getenv(passwd_env_arg)) == NULL) {
+			warn0("Failed to read from ${%s}", passwd_env_arg);
+			goto err1;
+		}
+
+		/* This allows us to use the same insecure_zero() logic. */
+		if ((passwd = strdup(passwd_env)) == NULL) {
+			warnp("Out of memory");
+			goto err1;
+		}
 	} else {
 		/* Prompt for a password. */
 		if (readpass(&passwd, "Please enter passphrase",
