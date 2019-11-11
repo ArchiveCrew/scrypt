@@ -187,10 +187,15 @@ main(int argc, char *argv[])
 		goto done;
 	}
 
-	/* Prompt for a password. */
-	if (readpass(&passwd, "Please enter passphrase",
-	    (dec || !devtty) ? NULL : "Please confirm passphrase", devtty))
-		goto err1;
+	/* Get the password. */
+	if (0) {
+	} else {
+		/* Prompt for a password. */
+		if (readpass(&passwd, "Please enter passphrase",
+		    (dec || !devtty) ? NULL : "Please confirm passphrase",
+		    devtty))
+			goto err1;
+	}
 
 	/*-
 	 * If we're decrypting, open the input file and process its header;
