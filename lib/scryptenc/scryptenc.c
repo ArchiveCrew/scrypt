@@ -170,11 +170,11 @@ checkparams(size_t maxmem, double maxmemfrac, double maxtime,
 
 	/* Sanity-check values. */
 	if ((logN < 1) || (logN > 63))
-		return (7);
+		return (SCRYPT_EINVAL);
 	if ((uint64_t)(r) * (uint64_t)(p) >= 0x40000000)
-		return (7);
+		return (SCRYPT_EINVAL);
 	if ((r == 0) || (p == 0))
-		return (7);
+		return (SCRYPT_EINVAL);
 
 	/* Are we forcing decryption, regardless of resource limits? */
 	if (!force) {
@@ -332,7 +332,7 @@ scryptdec_setup(const uint8_t header[96], uint8_t dk[64],
 	SHA256_Update(&ctx, header, 48);
 	SHA256_Final(hbuf, &ctx);
 	if (crypto_verify_bytes(&header[48], hbuf, 16))
-		return (7);
+		return (SCRYPT_EINVAL);
 
 	/*
 	 * Check whether the provided parameters are valid and whether the
@@ -449,7 +449,7 @@ scryptdec_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 	 * have at least 7 bytes of header.
 	 */
 	if ((inbuflen < 7) || (memcmp(inbuf, "scrypt", 6) != 0)) {
-		rc = 7;
+		rc = SCRYPT_EINVAL;
 		goto err0;
 	}
 
@@ -461,7 +461,7 @@ scryptdec_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 
 	/* We must have at least 128 bytes. */
 	if (inbuflen < 128) {
-		rc = 7;
+		rc = SCRYPT_EINVAL;
 		goto err0;
 	}
 
@@ -490,7 +490,7 @@ scryptdec_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 	HMAC_SHA256_Update(&hctx, inbuf, inbuflen - 32);
 	HMAC_SHA256_Final(hbuf, &hctx);
 	if (crypto_verify_bytes(hbuf, &inbuf[inbuflen - 32], 32)) {
-		rc = 7;
+		rc = SCRYPT_EINVAL;
 		goto err1;
 	}
 
@@ -632,14 +632,14 @@ scryptdec_file_load_header(FILE * infile, uint8_t header[static 96])
 			rc = 13;
 			goto err0;
 		} else {
-			rc = 7;
+			rc = SCRYPT_EINVAL;
 			goto err0;
 		}
 	}
 
 	/* Do we have the right magic? */
 	if (memcmp(header, "scrypt", 6)) {
-		rc = 7;
+		rc = SCRYPT_EINVAL;
 		goto err0;
 	}
 	if (header[6] != 0) {
@@ -656,7 +656,7 @@ scryptdec_file_load_header(FILE * infile, uint8_t header[static 96])
 			rc = 13;
 			goto err0;
 		} else {
-			rc = 7;
+			rc = SCRYPT_EINVAL;
 			goto err0;
 		}
 	}
@@ -794,14 +794,14 @@ scryptdec_file_copy(struct scryptdec_file_cookie * C, FILE * outfile)
 
 	/* Did we read enough data that we *might* have a valid signature? */
 	if (buflen < 32) {
-		rc = 7;
+		rc = SCRYPT_EINVAL;
 		goto err0;
 	}
 
 	/* Verify signature. */
 	HMAC_SHA256_Final(hbuf, &hctx);
 	if (crypto_verify_bytes(hbuf, buf, 32)) {
-		rc = 7;
+		rc = SCRYPT_EINVAL;
 		goto err0;
 	}
 
