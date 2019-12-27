@@ -155,7 +155,7 @@ pickparams(size_t maxmem, double maxmemfrac, double maxtime,
 		display_params(*logN, *r, *p, memlimit, opps, maxtime);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 }
 
 static int
@@ -203,7 +203,7 @@ checkparams(size_t maxmem, double maxmemfrac, double maxtime,
 		display_params(logN, r, p, memlimit, opps, maxtime);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 }
 
 /*
@@ -264,7 +264,7 @@ scryptenc_setup(uint8_t header[96], uint8_t dk[64],
 	memcpy(&header[64], hbuf, 32);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 }
 
 /**
@@ -293,7 +293,7 @@ scryptdec_file_printparams(FILE * infile)
 	display_params(logN, r, p, 0, 0, 0);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err0:
 	/* Failure! */
@@ -356,7 +356,7 @@ scryptdec_setup(const uint8_t header[96], uint8_t dk[64],
 		return (11);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 }
 
 /**
@@ -412,7 +412,7 @@ scryptenc_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 	insecure_memzero(dk, 64);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err1:
 	insecure_memzero(dk, 64);
@@ -498,7 +498,7 @@ scryptdec_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 	insecure_memzero(dk, 64);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err1:
 	insecure_memzero(dk, 64);
@@ -587,7 +587,7 @@ scryptenc_file(FILE * infile, FILE * outfile,
 	insecure_memzero(dk, 64);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err1:
 	insecure_memzero(dk, 64);
@@ -662,7 +662,7 @@ scryptdec_file_load_header(FILE * infile, uint8_t header[static 96])
 	}
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err0:
 	/* Failure! */
@@ -702,7 +702,7 @@ scryptdec_file_prep(FILE * infile, const uint8_t * passwd,
 	*cookie = C;
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err1:
 	scryptdec_file_cookie_free(C);
@@ -806,7 +806,7 @@ scryptdec_file_copy(struct scryptdec_file_cookie * C, FILE * outfile)
 	}
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err0:
 	/* Failure! */
@@ -841,7 +841,7 @@ scryptdec_file(FILE * infile, FILE * outfile, const uint8_t * passwd,
 	scryptdec_file_cookie_free(C);
 
 	/* Success! */
-	return (0);
+	return (SCRYPT_OK);
 
 err1:
 	scryptdec_file_cookie_free(C);
