@@ -390,7 +390,7 @@ scryptenc_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 
 	/* Encrypt data. */
 	if ((key_enc_exp = crypto_aes_key_expand(key_enc, 32)) == NULL) {
-		rc = 5;
+		rc = SCRYPT_EOPENSSL;
 		goto err1;
 	}
 	if ((AES = crypto_aesctr_init(key_enc_exp, 0)) == NULL) {
@@ -472,7 +472,7 @@ scryptdec_buf(const uint8_t * inbuf, size_t inbuflen, uint8_t * outbuf,
 
 	/* Decrypt data. */
 	if ((key_enc_exp = crypto_aes_key_expand(key_enc, 32)) == NULL) {
-		rc = 5;
+		rc = SCRYPT_EOPENSSL;
 		goto err1;
 	}
 	if ((AES = crypto_aesctr_init(key_enc_exp, 0)) == NULL) {
@@ -548,7 +548,7 @@ scryptenc_file(FILE * infile, FILE * outfile,
 	 * data as it is produced.
 	 */
 	if ((key_enc_exp = crypto_aes_key_expand(key_enc, 32)) == NULL) {
-		rc = 5;
+		rc = SCRYPT_EOPENSSL;
 		goto err1;
 	}
 	if ((AES = crypto_aesctr_init(key_enc_exp, 0)) == NULL) {
@@ -750,7 +750,7 @@ scryptdec_file_copy(struct scryptdec_file_cookie * C, FILE * outfile)
 	 * if that final 32 bytes is the correct signature.
 	 */
 	if ((key_enc_exp = crypto_aes_key_expand(key_enc, 32)) == NULL) {
-		rc = 5;
+		rc = SCRYPT_EOPENSSL;
 		goto err0;
 	}
 	if ((AES = crypto_aesctr_init(key_enc_exp, 0)) == NULL) {
