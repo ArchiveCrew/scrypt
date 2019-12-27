@@ -52,8 +52,9 @@ usage(void)
 
 	fprintf(stderr,
 	    "usage: scrypt {enc | dec | info} [-f] [-M maxmem]"
-	    " [-m maxmemfrac]\n"
-	    "              [-P] [-t maxtime] [-v] infile [outfile]\n"
+	    " [-m maxmemfrac] [-P]\n"
+	    "              [-t maxtime] [-v] [--passphrase method:arg]"
+	    " infile [outfile]\n"
 	    "       scrypt --version\n");
 	exit(1);
 }
@@ -78,6 +79,8 @@ main(int argc, char *argv[])
 	int verbose = 0;
 	struct scryptdec_file_cookie * C = NULL;
 	enum passphrase_entry passphrase_entry = PASSPHRASE_UNSET;
+	size_t passphrase_sep;
+	const char * passphrase_arg;
 
 	WARNP_INIT;
 
@@ -125,6 +128,37 @@ main(int argc, char *argv[])
 				exit(1);
 			}
 			break;
+		GETOPT_OPTARG("--passphrase"):
+			if (passphrase_entry != PASSPHRASE_UNSET) {
+				warn0("You can only enter one --passphrase or"
+				    " -P argument");
+				exit(1);
+			}
+
+			/* Find the separator in "method:arg". */
+			passphrase_sep = strcspn(optarg, ":");
+
+			/* We should have a string after the ':'. */
+			if (passphrase_sep + 1 >= strlen(optarg)) {
+				warn0("Invalid option: --passphrase %s",
+				    optarg);
+				exit(1);
+			}
+			passphrase_arg = optarg + passphrase_sep + 1;
+
+			/* Parse the entry method. */
+			if (strncmp(optarg, "dev", passphrase_sep) == 0) {
+				if (strcmp(passphrase_arg, "tty-stdin") == 0)
+					passphrase_entry = PASSPHRASE_TTY_STDIN;
+				else if (strcmp(passphrase_arg, "stdin-once") == 0)
+					passphrase_entry = PASSPHRASE_STDIN_ONCE;
+				else {
+					warn0("Invalid option: --passphrase %s",
+					    optarg);
+					exit(1);
+				}
+			}
+			break;
 		GETOPT_OPTARG("-t"):
 			if (PARSENUM(&maxtime, optarg, 0, INFINITY)) {
 				warnp("Invalid option: -t %s", optarg);
@@ -136,7 +170,8 @@ main(int argc, char *argv[])
 			break;
 		GETOPT_OPT("-P"):
 			if (passphrase_entry != PASSPHRASE_UNSET) {
-				warn0("You can only enter one -P argument");
+				warn0("You can only enter one --passphrase or"
+				    " -P argument");
 				exit(1);
 			}
 			passphrase_entry = PASSPHRASE_STDIN_ONCE;
