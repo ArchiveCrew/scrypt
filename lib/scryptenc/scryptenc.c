@@ -105,7 +105,7 @@ pickparams(size_t maxmem, double maxmemfrac, double maxtime,
 
 	/* Figure out how much memory to use. */
 	if (memtouse(maxmem, maxmemfrac, &memlimit))
-		return (1);
+		return (SCRYPT_ELIMIT);
 
 	/* Figure out how fast the CPU is. */
 	if ((rc = scryptenc_cpuperf(&opps)) != 0)
@@ -180,7 +180,7 @@ checkparams(size_t maxmem, double maxmemfrac, double maxtime,
 	if (!force) {
 		/* Figure out the maximum amount of memory we can use. */
 		if (memtouse(maxmem, maxmemfrac, &memlimit))
-			return (1);
+			return (SCRYPT_ELIMIT);
 
 		/* Figure out how fast the CPU is. */
 		if ((rc = scryptenc_cpuperf(&opps)) != 0)
